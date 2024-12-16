@@ -46,9 +46,9 @@ public class TokenProvider {
                 .header().add("typ", "JWT")
                          .add("alg", "HS256")
                 .and()
-                .issuer(jwtProperties.getIssuer())
-                .issuedAt(new Date())
-                .expiration(expiry)
+                .issuer(jwtProperties.getIssuer()) //yaml에 있는 issuer에서 e-mail 확인
+                .issuedAt(new Date()) //token 생성 시간 확인
+                .expiration(expiry) //token 만료 시점 확인
                 .claim("signedUser", makeClaimByUserToString(jwtUser))
                 .signWith(secretKey)
                 .compact();
@@ -92,7 +92,11 @@ public class TokenProvider {
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+        return Jwts.parser()
+                .verifyWith(secretKey) //서명 검증
+                .build()
+                .parseSignedClaims(token) //토큰에 담겨있는 signedUserId를 이용해서
+                .getPayload(); //payload를 가져온다.
 
     }
 
