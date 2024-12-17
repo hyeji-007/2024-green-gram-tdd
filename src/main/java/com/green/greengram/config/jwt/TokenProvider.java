@@ -43,22 +43,23 @@ public class TokenProvider {
     }
 
     private String makeToken(JwtUser jwtUser, Date expiry) {
-        // JWT 암호화
+        // JWT 암호화 >> 암호화된 문자열을 만드는 것
         return Jwts.builder()
-                .header().add("typ", "JWT")
-                         .add("alg", "HS256")
+                .header().type("JWT")
                 .and()
-                .issuer(jwtProperties.getIssuer()) //yaml에 있는 issuer에서 e-mail 확인
-                .issuedAt(new Date()) //token 생성 시간 확인
-                .expiration(expiry) //token 만료 시점 확인
-                .claim("signedUser", makeClaimByUserToString(jwtUser))
-                .signWith(secretKey)
-                .compact();
+                .issuer(jwtProperties.getIssuer()) // yaml에 있는 issuer에서 e-mail 확인, green@green.kr
+                .issuedAt(new Date()) // token 생성 시간
+                .expiration(expiry) // token 만료 시간
+                .claim("signedUser", makeClaimByUserToString(jwtUser)) // 비공개 claim
+                .signWith(secretKey) // 암호화
+                .compact(); // private String makeToken >> return type이 String
     }
 
     private String makeClaimByUserToString(JwtUser jwtUser) {
-        //객체 자체를 JWT에 담고 싶어서 객체를 직렬화
-        //직렬화: jwtUser에 담고있는 데이터를 JSON형태의 문자열로 변환
+        // 문자열이 아닌 객체를 담아야 한다.
+        // String을 객체화 하는 과정을 직렬화라고 한다.
+        // 객체 자체를 JWT에 담고 싶어서 객체를 직렬화
+        // 직렬화: jwtUser에 담고있는 데이터를 JSON형태의 문자열로 변환
         try {
             return objectMapper.writeValueAsString(jwtUser);
         } catch (JsonProcessingException e) {

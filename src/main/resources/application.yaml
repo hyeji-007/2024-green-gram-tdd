@@ -6,7 +6,7 @@ file:
 
 jwt:
   issuer: green@green.kr
-  secret-key: study-springboot
+  secret-key: studyspringbootbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 
 
 
