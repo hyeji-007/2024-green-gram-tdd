@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.Set;
 
 @Service
-public class TokenProvider {
+public class TokenProvider { //Jwt 담당
     private final ObjectMapper objectMapper; //Jackson 라이브러리
     private final JwtProperties jwtProperties;
     private final SecretKey secretKey;
