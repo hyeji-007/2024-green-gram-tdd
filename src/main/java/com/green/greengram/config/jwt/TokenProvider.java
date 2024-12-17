@@ -94,6 +94,7 @@ public class TokenProvider {
         } catch(JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+
         MyUserDetails userDetails = new MyUserDetails();
         userDetails.setJwtUser(jwtUser);
         return userDetails;
