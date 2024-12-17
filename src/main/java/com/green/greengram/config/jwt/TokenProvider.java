@@ -88,7 +88,12 @@ public class TokenProvider {
     public UserDetails getUserDetailsFromToken(String token) {
         Claims claims = getClaims(token);
         String json = (String)claims.get("signedUser");
-        JwtUser jwtUser = objectMapper.convertValue(json, JwtUser.class);
+        JwtUser jwtUser = null;
+        try{
+            jwtUser = objectMapper.readValue(json, JwtUser.class);
+        } catch(JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         MyUserDetails userDetails = new MyUserDetails();
         userDetails.setJwtUser(jwtUser);
         return userDetails;

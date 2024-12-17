@@ -1,5 +1,7 @@
 package com.green.greengram.config.jwt;
 
+import com.green.greengram.config.security.MyUserDetails;
+import io.jsonwebtoken.Jwt;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +34,7 @@ class TokenProviderTest {
         jwtUser.setRoles(roles);
 
         //When (실행단계)
-        String token = tokenProvider.generateToken(jwtUser, Duration.ofMinutes(1));
+        String token = tokenProvider.generateToken(jwtUser, Duration.ofHours(3));
 
         //Then (검증단계)
         assertNotNull(token);
@@ -53,11 +55,24 @@ class TokenProviderTest {
 
     @Test
     void getAuthentication() {
-        String token = ""; //3시간 짜리
+        String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzM4NCJ9.eyJpc3MiOiJncmVlbkBncmVlbi5rciIsImlhdCI6MTczNDQwMzc2NCwiZXhwIjoxNzM0NDE0NTY0LCJzaWduZWRVc2VyIjoie1wic2lnbmVkVXNlcklkXCI6MTAsXCJyb2xlc1wiOltcIlJPTEVfVVNFUlwiLFwiUk9MRV9BRE1JTlwiXX0ifQ.GhJuDzgxTU9kyajUCghb-q7UVSvWXHdziUNKGeP40rP3OkKNV05tJS_X_UKDDR0u"; //3시간 짜리
 
         Authentication authentication = tokenProvider.getAuthentication(token);
 
         assertNotNull(authentication);
+
+        MyUserDetails myUserDetails = (MyUserDetails) authentication.getPrincipal();
+        JwtUser jwtUser = myUserDetails.getJwtUser();
+
+        JwtUser expectedJwtUser = new JwtUser();
+        expectedJwtUser.setSignedUserId(10);
+
+        List<String> roles = new ArrayList<>(2);
+        roles.add("ROLE_USER");
+        roles.add("ROLE_ADMIN");
+        expectedJwtUser.setRoles(roles);
+
+        assertEquals(expectedJwtUser, jwtUser);
     }
 
 }
