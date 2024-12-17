@@ -38,6 +38,8 @@ public class TokenProvider {
     public String generateToken(JwtUser jwtUser, Duration expiredAt) {
         Date now = new Date();
         return makeToken(jwtUser, new Date(now.getTime() + expiredAt.toMillis()));
+        // 현재 시점으로부터 일정 기간 이후의 Date 객체를 만든다.
+        // jwtUser에는 payload에 담을 내용
     }
 
     private String makeToken(JwtUser jwtUser, Date expiry) {

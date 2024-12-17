@@ -9,6 +9,6 @@ import java.util.List;
 @Getter
 public class JwtUser {
     private long signedUserId;
-    private List<String> roles; //인가(권한)처리 때 사용
+    private List<String> roles; //인가(권한)처리 때 사용, ROLE_이름, ROLE_USER, ROLE_ADMIN
 
 }
