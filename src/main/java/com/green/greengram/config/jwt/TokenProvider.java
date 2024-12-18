@@ -35,23 +35,23 @@ public class TokenProvider { //Jwt 담당
     }
 
     // JWT 생성
-    public String generateToken(JwtUser jwtUser, Duration expiredAt) {
-        Date now = new Date();
-        return makeToken(jwtUser, new Date(now.getTime() + expiredAt.toMillis()));
+    public String generateToken(JwtUser jwtUser, Duration expiredAt) { //만료 기간
+        Date now = new Date(); //현재 시간, 기본 생성자
+        return makeToken(jwtUser, new Date(now.getTime() + expiredAt.toMillis())); //오버라이딩된 생성자
         // 현재 시점으로부터 일정 기간 이후의 Date 객체를 만든다.
         // jwtUser에는 payload에 담을 내용
     }
 
-    private String makeToken(JwtUser jwtUser, Date expiry) {
-        // JWT 암호화 >> 암호화된 문자열을 만드는 것
+    private String makeToken(JwtUser jwtUser, Date expiry) { //만료 시점
+        // JWT 암호화 / 직렬화 >> 암호화된 문자열을 만드는 것
         return Jwts.builder()
                 .header().type("JWT")
                 .and()
                 .issuer(jwtProperties.getIssuer()) // yaml에 있는 issuer에서 e-mail 확인, green@green.kr
                 .issuedAt(new Date()) // token 생성 시간
-                .expiration(expiry) // token 만료 시간
-                .claim("signedUser", makeClaimByUserToString(jwtUser)) // 비공개 claim
-                .signWith(secretKey) // 암호화
+                .expiration(expiry) // token 만료 시점 **
+                .claim("signedUser", makeClaimByUserToString(jwtUser)) // 비공개 claim **
+                .signWith(secretKey) // 암호화 **
                 .compact(); // private String makeToken >> return type이 String
     }
 
@@ -61,7 +61,7 @@ public class TokenProvider { //Jwt 담당
         // 객체 자체를 JWT에 담고 싶어서 객체를 직렬화
         // 직렬화: jwtUser에 담고있는 데이터를 JSON형태의 문자열로 변환
         try {
-            return objectMapper.writeValueAsString(jwtUser);
+            return objectMapper.writeValueAsString(jwtUser); //  objectMapper: Object >> String >> Object
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -72,12 +72,13 @@ public class TokenProvider { //Jwt 담당
         try {
             // JWT 복호화
             getClaims(token);
-            return true;
         } catch (Exception e) {
             return false;
         }
+        return true;
     }
 
+    // Spring Security에서 인증 처리를 해주어야 한다. 그때 Authentication 객체가 필요
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = getUserDetailsFromToken(token);
         return userDetails == null

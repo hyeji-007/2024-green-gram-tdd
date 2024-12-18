@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @Schema(title = "로그인 응답")
 public class UserSignInRes {
+    private String accessToken;
     private long userId;
     private String nickName;
     private String pic;

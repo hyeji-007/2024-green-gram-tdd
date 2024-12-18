@@ -4,17 +4,15 @@ package com.green.greengram.config.security;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springdoc.webmvc.core.service.RequestService;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.web.servlet.filter.OrderedFormContentFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 @Configuration // 메소드 빈등록이 있어야 의미가 있다. 메소드 빈등록이 싱글톤이 됨.
 @RequiredArgsConstructor
@@ -32,11 +30,18 @@ public class WebSecurityConfig {
                 .formLogin(form -> form.disable()) //폼로그인 기능 자체를 비활성화
                 .csrf(csrf -> csrf.disable()) //보안관련 SSR이 아니면 보안이슈가 없기 때문에 기능을 끈다.
                 .authorizeHttpRequests(req ->
-                        req.requestMatchers("/api/feed", "/api/feed/ver3", "/api/").authenticated() //로그인이 되어 있어야만 사용 가능
-                .anyRequest().permitAll() //나머지 요청은 모두 허용
+                        req.requestMatchers("/api/feed", "/api/feed/**").authenticated() //로그인이 되어 있어야만 사용 가능
+                                .requestMatchers(HttpMethod.GET,"/api/user").authenticated()
+                                .requestMatchers(HttpMethod.PATCH,"/api/user/pic").authenticated()
+                        .anyRequest().permitAll() //나머지 요청은 모두 허용
                 )
 
                 .build();
+    }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 }
