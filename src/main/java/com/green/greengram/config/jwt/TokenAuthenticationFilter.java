@@ -20,7 +20,7 @@ import java.io.IOException;
 public class TokenAuthenticationFilter extends OncePerRequestFilter { //기본 생성자 || 추상메소드 문제 >> 에러
     private final TokenProvider tokenProvider; //빈등록 + 생성자 >> DI 받을 수 있음
     private final static String HEADER_AUTHORIZATION = "Authorization";
-    private final static String TOKEN_PREFIX = "Bearer";
+    private final static String TOKEN_PREFIX = "Bearer ";
 
 
     @Override
