@@ -1,6 +1,7 @@
 package com.green.greengram.config.security;
 //Spring Security 세팅
 
+import com.green.greengram.config.jwt.TokenAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springdoc.webmvc.core.service.RequestService;
@@ -11,12 +12,16 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Configuration // 메소드 빈등록이 있어야 의미가 있다. 메소드 빈등록이 싱글톤이 됨.
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+    private final TokenAuthenticationFilter tokenAuthenticationFilter; //DI
+
     // 스프링 시큐리티 기능 비활성화 (스프링 시큐리티가 관여하지 않았으면 하는 부분)
 //    public WebSecurityCustomizer webSecurityCustomizer() {
 //        return web -> web.ignoring()
@@ -35,12 +40,12 @@ public class WebSecurityConfig {
                                 .requestMatchers(HttpMethod.PATCH,"/api/user/pic").authenticated()
                         .anyRequest().permitAll() //나머지 요청은 모두 허용
                 )
-
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 

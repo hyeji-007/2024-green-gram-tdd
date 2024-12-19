@@ -27,7 +27,7 @@ import java.util.List;
 public class UserService {
     private final UserMapper mapper;
     private final MyFileUtils myFileUtils;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder; //BCrypt 대신 DI 받은 PasswordEncoder 사용
     private final TokenProvider tokenProvider;
     private final CookieUtils cookieUtils;
 
@@ -71,7 +71,7 @@ public class UserService {
             res.setMessage("아이디를 확인해 주세요.");
             log.info("sadadsadadsad");
             return res;
-        } else if(!passwordEncoder.matches(p.getUpw(), res.getUpw())) {
+        } else if(!passwordEncoder.matches(p.getUpw(), res.getUpw())) { //비밀번호가 다를시
         //} else if( !BCrypt.checkpw(p.getUpw(), res.getUpw()) ) { //비밀번호가 다를시
             res = new UserSignInRes();
             res.setMessage("비밀번호를 확인해 주세요.");
@@ -81,6 +81,7 @@ public class UserService {
         }
 
         /*
+        아이디 있고 비번 같으면 토큰 생성
         JWT 토큰 생성 2개? AccessToken(20분), RefreshToken(15일)
          */
 
