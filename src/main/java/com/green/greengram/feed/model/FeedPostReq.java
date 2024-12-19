@@ -12,8 +12,9 @@ public class FeedPostReq {
     @JsonIgnore
     private long feedId;
 
-    @Schema(title="로그인 유저 PK", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+    @JsonIgnore
     private long writerUserId;
+
     @Schema(title="피드 내용", example = "피드 내용 테스트")
     private String contents;
     @Schema(title="피드 위치", example = "그린컴퓨터학원")

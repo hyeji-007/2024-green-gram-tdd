@@ -17,8 +17,7 @@ public class FeedCommentPostReq {
     @Schema(title = "피드 PK", example = "1"
             , requiredMode = Schema.RequiredMode.REQUIRED)
     private long feedId;
-    @Schema(title = "로그인한 유저 PK", example = "2"
-            , requiredMode = Schema.RequiredMode.REQUIRED)
+    @JsonIgnore
     private long userId;
     @Schema(title = "댓글 내용", example = "댓글입니다."
             , requiredMode = Schema.RequiredMode.REQUIRED)
