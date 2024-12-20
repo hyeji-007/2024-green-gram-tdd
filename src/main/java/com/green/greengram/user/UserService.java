@@ -71,20 +71,17 @@ public class UserService {
         if( res == null ) { //아이디 없음
             res = new UserSignInRes();
             res.setMessage("아이디를 확인해 주세요.");
-            log.info("sadadsadadsad");
             return res;
         } else if(!passwordEncoder.matches(p.getUpw(), res.getUpw())) { //비밀번호가 다를시
         //} else if( !BCrypt.checkpw(p.getUpw(), res.getUpw()) ) { //비밀번호가 다를시
             res = new UserSignInRes();
             res.setMessage("비밀번호를 확인해 주세요.");
-            log.info("sadadsadadsad2");
             return res;
-
         }
 
         /*
         아이디 있고 비번 같으면 토큰 생성
-        JWT 토큰 생성 2개? AccessToken(20분), RefreshToken(15일)
+        JWT 토큰 생성 2개? AccessToken(20분): 인증, RefreshToken(15일): 재발행
          */
 
         JwtUser jwtUser = new JwtUser();
@@ -95,7 +92,7 @@ public class UserService {
         jwtUser.getRoles().add("ROLE_ADMIN");
 
 
-        String accessToken = tokenProvider.generateToken(jwtUser, Duration.ofMinutes(1));
+        String accessToken = tokenProvider.generateToken(jwtUser, Duration.ofMinutes(100));
         String refreshToken = tokenProvider.generateToken(jwtUser, Duration.ofDays(15));
 
         //refreshToken은 쿠키에 담는다.

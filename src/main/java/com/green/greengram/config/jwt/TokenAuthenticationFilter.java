@@ -32,11 +32,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter { //기본 �
         String token = getAccessToken(authorizationHeader);
         log.info("token: {}", token);
 
-        if(tokenProvider.validToken(token)) {
+        if(tokenProvider.validToken(token)) { //토큰 문제가 없는지 검정, 문제 없으면 True
             Authentication auth = tokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(auth); //set 쓰는 이유: get 하려고
         }
-
         filterChain.doFilter(request, response);
     }
 
