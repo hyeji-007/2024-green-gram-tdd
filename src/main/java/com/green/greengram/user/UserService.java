@@ -123,8 +123,7 @@ public class UserService {
         log.info("refreshToken: {}", refreshToken);
 
         JwtUser jwtUser = tokenProvider.getJwtUserFromToken(refreshToken);
-        String accessToken = tokenProvider.generateToken(jwtUser, Duration.ofMinutes(1));
-        return accessToken;
+        return tokenProvider.generateToken(jwtUser, Duration.ofMinutes(100));
     }
 
 
