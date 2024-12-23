@@ -2,6 +2,8 @@ package com.green.greengram.config.jwt;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.green.greengram.common.exception.CustomException;
+import com.green.greengram.common.exception.UserErrorCode;
 import com.green.greengram.config.security.MyUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -60,17 +62,6 @@ public class TokenProvider { //Jwt 담당
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public boolean validToken(String token) {
-
-        try {
-            // JWT 복호화
-            getClaims(token);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
     }
 
     // Spring Security에서 인증 처리를 해주어야 한다. 그때 Authentication 객체가 필요

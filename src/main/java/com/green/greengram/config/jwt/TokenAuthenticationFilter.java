@@ -22,19 +22,22 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter { //기본 �
     private final static String HEADER_AUTHORIZATION = "Authorization";
     private final static String TOKEN_PREFIX = "Bearer ";
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("ip Address: {}", request.getRemoteAddr());
-        String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION); //Bearer 토큰값
+        String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION);  //"Bearer 토큰값"
         log.info("authorizationHeader: {}", authorizationHeader);
 
         String token = getAccessToken(authorizationHeader);
         log.info("token: {}", token);
 
-        if(tokenProvider.validToken(token)) { //토큰 문제가 없는지 검정, 문제 없으면 True
-            Authentication auth = tokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth); //set 쓰는 이유: get 하려고
+        if(token != null) {
+            try {
+                Authentication auth = tokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } catch (Exception e) {
+                request.setAttribute("exception", e);
+            }
         }
         filterChain.doFilter(request, response);
     }

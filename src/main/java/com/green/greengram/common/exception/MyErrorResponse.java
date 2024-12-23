@@ -27,6 +27,6 @@ public class MyErrorResponse extends ResultResponse<String> {
                     .field(fieldError.getField())
                     .message(fieldError.getDefaultMessage())
                     .build();
-        } //builder 패턴으로 객체화
+        } //builder 패턴으로 객체화한 뒤 return
     }
 }
