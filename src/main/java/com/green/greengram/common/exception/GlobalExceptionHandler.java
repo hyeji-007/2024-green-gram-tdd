@@ -43,6 +43,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return null;
     }
 
+    private MyErrorResponse makeErrorResponse(ErrorCode errorCode, BindException e) {
+        return MyErrorResponse.builder()
+                .resultMessage(errorCode.getMessage())
+                .resultData(errorCode.name())
+                .valids(e == null ? null : getValidationError(e))
+                .build();
+    }
+
 
     private List<MyErrorResponse.ValidationError> getValidationError(BindException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
