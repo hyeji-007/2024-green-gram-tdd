@@ -1,5 +1,6 @@
 package com.green.greengram.common.exception;
 
+import io.jsonwebtoken.security.SignatureException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +15,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-
-import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(SignatureException.class) //토큰이 오염 되었을 때
     public ResponseEntity<Object> handleSignatureException() {
-        return handleExceptionInternal(UserErrorCode.UNAUTHENTICATED);
+        return handleExceptionInternal(UserErrorCode.INVALID_TOKEN);
     }
 
     @ExceptionHandler(MalformedJwtException.class) //토큰 값이 유효하지 않을 때
