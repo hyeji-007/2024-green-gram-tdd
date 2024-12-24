@@ -9,3 +9,5 @@ public interface ErrorCode {
     String getMessage();
     HttpStatus getHttpStatus(); //응답 코드 결정
 }
+
+
