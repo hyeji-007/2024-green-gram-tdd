@@ -21,7 +21,7 @@ public class FeedCommentGetReq {
     private long feedId;
 
     @PositiveOrZero
-    @Schema(title="튜플 시작 index", description = "댓글 Element 개수를 보내주면 된다.", name="start_idx", example = "3", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(title="튜플 시작 index", description = "댓글 Element 갯수를 보내주면 된다.", name="start_idx", example = "3", requiredMode = Schema.RequiredMode.REQUIRED)
     private int startIdx;
 
     @Min(value = 21, message = "사이즈는 20이상이어야 합니다.")
@@ -35,18 +35,3 @@ public class FeedCommentGetReq {
         this.size = (size == null ? Constants.getDefault_page_size() : size) + 1;
     }
 }
-
-//    private void setPage(int page) { //(0,4), (3, 21), (23, 21)
-//        this.page = page;
-//        if(page < 1) { return; } //튕겨서 작업 x
-//        if(page == 1) {
-//            startIdx = 0;
-//            size = FIRST_COMMENT_SIZE + 1; // +1은 isMore 처리용
-//            return;
-//        }
-//        startIdx = ( (page - 2) * DEFAULT_PAGE_SIZE ) + FIRST_COMMENT_SIZE;
-//        size = DEFAULT_PAGE_SIZE + 1; // +1은 isMore 처리용 (더보기)
-//    }
-
-
-

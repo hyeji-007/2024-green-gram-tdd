@@ -9,10 +9,12 @@ import com.green.greengram.feed.comment.model.FeedCommentDto;
 import com.green.greengram.feed.comment.model.FeedCommentGetReq;
 import com.green.greengram.feed.comment.model.FeedCommentGetRes;
 import com.green.greengram.feed.model.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Validated
 public class FeedService {
     private final FeedMapper feedMapper;
     private final FeedPicMapper feedPicMapper;
@@ -33,15 +36,13 @@ public class FeedService {
     private final AuthenticationFacade authenticationFacade;
 
     @Transactional
-    // 자동 커밋 종료
+    //자동 커밋 종료
     public FeedPostRes postFeed(List<MultipartFile> pics, FeedPostReq p) {
-
         p.setWriterUserId(authenticationFacade.getSignedUserId());
         int result = feedMapper.insFeed(p);
-        if(pics.size() == 0) {
+        if(result == 0) {
             throw new CustomException(FeedErrorCode.FAIL_TO_REG);
         }
-
         // --------------- 파일 등록
         long feedId = p.getFeedId();
 
@@ -73,10 +74,11 @@ public class FeedService {
         return FeedPostRes.builder()
                 .feedId(feedId)
                 .pics(picNameList)
-
-
                 .build();
     }
+
+    //에러가 터졌다 rollback
+    //에러가 안 터졌다 commit;
 
     public List<FeedGetRes> getFeedList(FeedGetReq p) {
         p.setSignedUserId(authenticationFacade.getSignedUserId());
@@ -105,11 +107,59 @@ public class FeedService {
 
     //select 2번
     public List<FeedGetRes> getFeedList2(FeedGetReq p) {
-        //SELECT (1): feed  + feed_pic
+        List<FeedGetRes> list = new ArrayList<>(p.getSize());
+
+        //SELECT (1): feed + feed_pic
+        List<FeedAndPicDto> feedAndPicDtoList = feedMapper.selFeedWithPicList(p);
+        List<Long> feedIds = new ArrayList<>(list.size());
+
+        FeedGetRes beforeFeedGetRes = new FeedGetRes();
+        for(FeedAndPicDto feedAndPicDto : feedAndPicDtoList) {
+            if(beforeFeedGetRes.getFeedId() != feedAndPicDto.getFeedId()) {
+                feedIds.add(feedAndPicDto.getFeedId());
+
+                beforeFeedGetRes = new FeedGetRes();
+                beforeFeedGetRes.setPics(new ArrayList<>(3));
+                list.add(beforeFeedGetRes);
+                beforeFeedGetRes.setFeedId(feedAndPicDto.getFeedId());
+                beforeFeedGetRes.setContents(feedAndPicDto.getContents());
+                beforeFeedGetRes.setLocation(feedAndPicDto.getLocation());
+                beforeFeedGetRes.setCreatedAt(feedAndPicDto.getCreatedAt());
+                beforeFeedGetRes.setWriterUserId(feedAndPicDto.getWriterUserId());
+                beforeFeedGetRes.setWriterNm(feedAndPicDto.getWriterNm());
+                beforeFeedGetRes.setWriterPic(feedAndPicDto.getWriterPic());
+                beforeFeedGetRes.setIsLike(feedAndPicDto.getIsLike());
+            }
+            beforeFeedGetRes.getPics().add(feedAndPicDto.getPic());
+        }
 
         //SELECT (2): feed_comment
+        List<FeedCommentDto> feedCommentList = feedCommentMapper.selFeedCommentListByFeedIdsLimit4Ver2(feedIds);
+        Map<Long, FeedCommentGetRes> commentHashMap = new HashMap<>();
+        for(FeedCommentDto item : feedCommentList) {
+            long feedId = item.getFeedId();
+            if(!commentHashMap.containsKey(feedId)) {
+                FeedCommentGetRes feedCommentGetRes = new FeedCommentGetRes();
+                feedCommentGetRes.setCommentList(new ArrayList<>(4));
+                commentHashMap.put(feedId, feedCommentGetRes);
+            }
+            FeedCommentGetRes feedCommentGetRes = commentHashMap.get(feedId);
+            feedCommentGetRes.getCommentList().add(item);
+        }
+        for(FeedGetRes res : list) {
+            FeedCommentGetRes feedCommentGetRes = commentHashMap.get(res.getFeedId());
 
-        return null;
+            if(feedCommentGetRes == null) { //댓글이 하나도 없었던 피드인 경우
+                feedCommentGetRes = new FeedCommentGetRes();
+                feedCommentGetRes.setCommentList(new ArrayList<>());
+            } else if (feedCommentGetRes.getCommentList().size() == 4) {
+                feedCommentGetRes.setMoreComment(true);
+                feedCommentGetRes.getCommentList().remove(feedCommentGetRes.getCommentList().size() - 1);
+            }
+            res.setComment(feedCommentGetRes);
+        }
+
+        return list;
     }
 
 
@@ -118,12 +168,14 @@ public class FeedService {
         p.setSignedUserId(authenticationFacade.getSignedUserId());
         //피드 리스트
         List<FeedGetRes> list = feedMapper.selFeedList(p);
-        if (list.size() == 0) { //가져올 피드의 정보가 없을 경우
+        if (list.size() == 0) {
             return list;
         }
 
         //feed_id를 골라내야 한다.
+        //list.stream().mapToLong(FeedGetRes::getFeedId).sum();
         List<Long> feedIds4 = list.stream().map(FeedGetRes::getFeedId).collect(Collectors.toList());
+
         List<Long> feedIds5 = list.stream().map(item -> ((FeedGetRes)item).getFeedId()).toList();
         List<Long> feedIds6 = list.stream().map(item -> { return ((FeedGetRes)item).getFeedId();}).toList();
 
@@ -141,31 +193,16 @@ public class FeedService {
         for(FeedPicSel item : feedPicList) {
             long feedId = item.getFeedId();
             if(!picHashMap.containsKey(feedId)) {
-                picHashMap.put(feedId, new ArrayList<String>(2));
+                picHashMap.put(feedId, new ArrayList<>(3));
             }
             List<String> pics = picHashMap.get(feedId);
             pics.add(item.getPic());
         }
 
-
-
-//        int lastIndex = 0;
-//        for(FeedGetRes res : list) {
-//            List<String> pics = new ArrayList<>(2);
-//            for(int i=lastIndex; i<feedPicList.size(); i++) {
-//                FeedPicSel feedPicSel = feedPicList.get(i);
-//                if(res.getFeedId() == feedPicSel.getFeedId()) {
-//                    pics.add(feedPicSel.getPic());
-//                } else {
-//                    res.setPics(pics);
-//                    lastIndex = i;
-//                    break;
-//                }
-//            }
-//        }
-
         //피드와 관련된 댓글 리스트
-        List<FeedCommentDto> feedCommentList = feedCommentMapper.selFeedCommentListByFeedIdsLimit4(feedIds);
+
+        //댓글이 있는 경우만 정리
+        List<FeedCommentDto> feedCommentList = feedCommentMapper.selFeedCommentListByFeedIdsLimit4Ver2(feedIds);
         Map<Long, FeedCommentGetRes> commentHashMap = new HashMap<>();
         for(FeedCommentDto item : feedCommentList) {
             long feedId = item.getFeedId();
@@ -182,7 +219,7 @@ public class FeedService {
             res.setPics(picHashMap.get(res.getFeedId()));
             FeedCommentGetRes feedCommentGetRes = commentHashMap.get(res.getFeedId());
 
-            if(feedCommentGetRes == null) {
+            if(feedCommentGetRes == null) { //댓글이 하나도 없었던 피드인 경우
                 feedCommentGetRes = new FeedCommentGetRes();
                 feedCommentGetRes.setCommentList(new ArrayList<>());
             } else if (feedCommentGetRes.getCommentList().size() == 4) {
@@ -193,6 +230,12 @@ public class FeedService {
         }
         log.info("list: {}", list);
         return list;
+    }
+
+    public List<FeedGetRes> getFeedList4(FeedGetReq p) {
+        List<FeedWithPicCommentDto> dtoList = feedMapper.selFeedWithPicAndCommentLimit4List(p);
+
+        return null;
     }
 
 

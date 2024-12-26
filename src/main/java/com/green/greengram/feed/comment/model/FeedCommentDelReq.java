@@ -3,12 +3,10 @@ package com.green.greengram.feed.comment.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.beans.ConstructorProperties;
 
-@Setter
 @Getter
 @ToString
 public class FeedCommentDelReq {

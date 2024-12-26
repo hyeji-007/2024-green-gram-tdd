@@ -33,10 +33,21 @@ public class FeedController {
     }
 
     @GetMapping
-    @Operation(summary = "Feed 리스트", description = "signed_user_id는 로그인한 사용자의 pk")
+    @Operation(summary = "Feed 리스트 - N+1", description = "signed_user_id는 로그인한 사용자의 pk")
     public ResultResponse<List<FeedGetRes>> getFeedList(@Valid @ParameterObject @ModelAttribute FeedGetReq p) {
         log.info("FeedController > getFeedList > p: {}", p);
-        List<FeedGetRes> list = service.getFeedList3(p);
+        List<FeedGetRes> list = service.getFeedList(p);
+        return ResultResponse.<List<FeedGetRes>>builder()
+                .resultMessage(String.format("%d rows", list.size()))
+                .resultData(list)
+                .build();
+    }
+
+    @GetMapping("ver2")
+    @Operation(summary = "Feed 리스트 - No N+1", description = "signed_user_id는 로그인한 사용자의 pk")
+    public ResultResponse<List<FeedGetRes>> getFeedListVer2(@Valid @ParameterObject @ModelAttribute FeedGetReq p) {
+        log.info("FeedController > getFeedList > p: {}", p);
+        List<FeedGetRes> list = service.getFeedList2(p);
         return ResultResponse.<List<FeedGetRes>>builder()
                 .resultMessage(String.format("%d rows", list.size()))
                 .resultData(list)
@@ -46,8 +57,19 @@ public class FeedController {
     @GetMapping("ver3")
     @Operation(summary = "Feed 리스트 - No N+1", description = "signed_user_id는 로그인한 사용자의 pk")
     public ResultResponse<List<FeedGetRes>> getFeedListVer3(@Valid @ParameterObject @ModelAttribute FeedGetReq p) {
-        log.info("FeedController > getFeedList > p: {}", p);
+        log.info("FeedController > getFeedListVer3 > p: {}", p);
         List<FeedGetRes> list = service.getFeedList3(p);
+        return ResultResponse.<List<FeedGetRes>>builder()
+                .resultMessage(String.format("%d rows", list.size()))
+                .resultData(list)
+                .build();
+    }
+
+    @GetMapping("ver4")
+    @Operation(summary = "Feed 리스트 - No N+1 - using Mybatis", description = "signed_user_id는 로그인한 사용자의 pk")
+    public ResultResponse<List<FeedGetRes>> getFeedListVer4(@Valid @ParameterObject @ModelAttribute FeedGetReq p) {
+        log.info("FeedController > getFeedListVer4 > p: {}", p);
+        List<FeedGetRes> list = service.getFeedList4(p);
         return ResultResponse.<List<FeedGetRes>>builder()
                 .resultMessage(String.format("%d rows", list.size()))
                 .resultData(list)
@@ -64,6 +86,4 @@ public class FeedController {
                 .resultData(result)
                 .build();
     }
-
 }
-

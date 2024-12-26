@@ -68,23 +68,3 @@ public class FeedCommentController {
     }
 
 }
-
-    /*
-    @DeleteMapping
-    @Operation(summary = "댓글 삭제2")
-    public ResultResponse<Long> deleteFeedComment (@RequestParam("feed_comment_id") long feedCommentId,
-                                                   @RequestParam("signed_user_id") long signedUserId) {
-        FeedCommentDelReq p = new FeedCommentDelReq(0,0);
-        p.setFeedCommentId(feedCommentId);
-        p.setSignedUserId(signedUserId);
-        log.info("delFeedComment {}", p.toString());
-        long result = service.deleteFeedComment(p);
-        return ResultResponse.<Long>builder()
-                .resultMessage("댓글 삭제 완료")
-                .resultData(result)
-                .build();
-    }
-     */
-
-
-

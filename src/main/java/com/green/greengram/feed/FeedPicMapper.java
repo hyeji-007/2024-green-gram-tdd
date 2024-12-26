@@ -13,4 +13,3 @@ public interface FeedPicMapper {
     List<String> selFeedPicList(long feedId);
     List<FeedPicSel> selFeedPicListByFeedIds(List<Long> feedIds);
 }
-

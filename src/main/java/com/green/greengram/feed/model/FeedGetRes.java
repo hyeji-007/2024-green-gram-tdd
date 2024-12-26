@@ -34,5 +34,6 @@ public class FeedGetRes {
     private List<String> pics;
     @Schema(title = "피드 댓글")
     private FeedCommentGetRes comment;
-}
 
+
+}

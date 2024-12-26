@@ -1,3 +1,4 @@
+
 package com.green.greengram.feed.comment;
 
 import com.green.greengram.feed.comment.model.FeedCommentDelReq;
@@ -13,5 +14,6 @@ public interface FeedCommentMapper {
     void insFeedComment(FeedCommentPostReq p);
     List<FeedCommentDto> selFeedCommentList(FeedCommentGetReq p);
     List<FeedCommentDto> selFeedCommentListByFeedIdsLimit4(List<Long> feedIds);
+    List<FeedCommentDto> selFeedCommentListByFeedIdsLimit4Ver2(List<Long> feedIds);
     int delFeedComment(FeedCommentDelReq p);
 }

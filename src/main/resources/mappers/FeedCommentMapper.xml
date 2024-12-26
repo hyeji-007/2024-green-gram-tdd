@@ -26,7 +26,7 @@
     </select>
 
     <select id="selFeedCommentListByFeedIdsLimit4">
-        SELECT T.feedId, T.feedCommentId, T.comment
+        SELECT T.feedId, T.feedCommentId, T.comment, T.writerUserId, T.writerNm, T.writerPic
         FROM (
         SELECT ROW_NUMBER() OVER (PARTITION BY A.feed_id ORDER BY A.feed_id, A.feed_comment_id DESC) AS num
         , A.feed_id AS feedId
@@ -38,9 +38,36 @@
         FROM feed_comment A
         INNER JOIN user B
         ON A.user_id = B.user_id
-        WHERE A.feed_id IN (12, 11, 10)
+        WHERE A.feed_id IN
+        <foreach collection="feedIds" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
         ) T
-        WHERE T.num  <![CDATA[ <= ]]> 4
+        WHERE T.num <![CDATA[ <= ]]> 4
+    </select>
+
+
+    <select id="selFeedCommentListByFeedIdsLimit4Ver2">
+        SELECT T1.feed_id AS feedId
+        , T1.feed_comment_id AS feedCommentId
+        , T1.comment
+        , T2.user_id AS writerUserId
+        , IF(T2.nick_name IS NULL, T2.uid, T2.nick_name) AS writerNm
+        , T2.pic AS writerPic
+        FROM feed_comment T1
+        INNER JOIN user T2
+        ON T1.user_id = T2.user_id
+        WHERE T1.feed_id IN
+        <foreach collection="feedIds" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND (
+        SELECT COUNT(feed_comment_id)
+        FROM feed_comment S1
+        WHERE T1.feed_id = S1.feed_id
+        AND T1.feed_comment_id <![CDATA[ < ]]> S1.feed_comment_id
+        ) <![CDATA[ < ]]> 4
+        ORDER BY T1.feed_id, T1.feed_comment_id DESC
     </select>
 
     <delete id="delFeedComment">

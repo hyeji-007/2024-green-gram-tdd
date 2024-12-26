@@ -12,15 +12,12 @@ import lombok.ToString;
 @ToString
 public class FeedCommentPostReq {
     @JsonIgnore
-    private long feedCommentId; //PK 값 설젇
+    private long feedCommentId;
 
-    @Schema(title = "피드 PK", example = "1"
-            , requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(title = "피드 PK", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private long feedId;
     @JsonIgnore
     private long userId;
-    @Schema(title = "댓글 내용", example = "댓글입니다."
-            , requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(title = "댓글 내용", example = "댓글입니다.", requiredMode = Schema.RequiredMode.REQUIRED)
     private String comment;
 }
-

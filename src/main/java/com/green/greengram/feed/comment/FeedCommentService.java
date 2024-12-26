@@ -26,7 +26,7 @@ public class FeedCommentService {
     public FeedCommentGetRes getFeedComment(FeedCommentGetReq p) {
         FeedCommentGetRes res = new FeedCommentGetRes();
         if(p.getStartIdx() < 0) {
-            res.setCommentList(new ArrayList<>()); //빈 댓글 리스트를 응답으로 반환
+            res.setCommentList(new ArrayList<>());
             return res;
         }
         List<FeedCommentDto> commentList = mapper.selFeedCommentList(p); //1~21사이
