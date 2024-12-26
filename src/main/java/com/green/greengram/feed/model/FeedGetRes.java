@@ -1,11 +1,13 @@
 package com.green.greengram.feed.model;
 
+import com.green.greengram.feed.comment.model.FeedCommentDto;
 import com.green.greengram.feed.comment.model.FeedCommentGetRes;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -35,5 +37,6 @@ public class FeedGetRes {
     @Schema(title = "피드 댓글")
     private FeedCommentGetRes comment;
 
-
 }
+
+

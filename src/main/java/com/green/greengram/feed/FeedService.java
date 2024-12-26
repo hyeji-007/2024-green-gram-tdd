@@ -232,10 +232,15 @@ public class FeedService {
         return list;
     }
 
+
     public List<FeedGetRes> getFeedList4(FeedGetReq p) {
         List<FeedWithPicCommentDto> dtoList = feedMapper.selFeedWithPicAndCommentLimit4List(p);
-
-        return null;
+        List<FeedGetRes> res = new ArrayList<>(dtoList.size());
+        for(FeedWithPicCommentDto dto : dtoList){
+            FeedGetRes res1 = new FeedGetRes(dto);
+            res.add(res1);
+        }
+        return res;
     }
 
 
