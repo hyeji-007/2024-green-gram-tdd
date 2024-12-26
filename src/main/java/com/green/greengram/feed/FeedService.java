@@ -105,6 +105,10 @@ public class FeedService {
 
     //select 2번
     public List<FeedGetRes> getFeedList2(FeedGetReq p) {
+        //SELECT (1): feed  + feed_pic
+
+        //SELECT (2): feed_comment
+
         return null;
     }
 
