@@ -81,6 +81,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         for(FieldError fieldError : fieldErrors) {
             errors.add(MyErrorResponse.ValidationError.of(fieldError));
         }
+
+
+
+
         return errors;
     }
 
