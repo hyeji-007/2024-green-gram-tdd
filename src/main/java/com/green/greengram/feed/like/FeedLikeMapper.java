@@ -11,4 +11,5 @@ public interface FeedLikeMapper {
     int insFeedLike(@Valid FeedLikeReq p);
     int delFeedLike(@Valid FeedLikeReq p);
 
+
 }
