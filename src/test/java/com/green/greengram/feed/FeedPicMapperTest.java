@@ -26,7 +26,6 @@ class FeedPicMapperTest {
     @Autowired FeedPicTestMapper feedPicTestMapper;
 
     @Test
-
     void insFeedPicNoFeedIdThrowForeignKeyException() {
         FeedPicDto givenParam = new FeedPicDto();
         givenParam.setFeedId(10L);
