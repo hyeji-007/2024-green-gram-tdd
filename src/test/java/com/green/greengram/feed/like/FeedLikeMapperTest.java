@@ -1,5 +1,6 @@
 package com.green.greengram.feed.like;
 
+import com.green.greengram.TestUtils;
 import com.green.greengram.feed.like.model.FeedLikeReq;
 import com.green.greengram.feed.like.model.FeedLikeVo;
 import org.junit.jupiter.api.BeforeAll;
@@ -91,11 +92,12 @@ class FeedLikeMapperTest {
 
         //then
         assertAll(
-                  () -> assertEquals(actualFeedLikeListBefore.size() + 1, actualFeedLikeListAfter.size())
-                , () -> assertNull(actualFeedLikeVoBefore)
-                , () -> assertNotNull(actualFeedLikeVoAfter)
+                  () -> TestUtils.assertCurrentTimestamp(actualFeedLikeVoAfter.getCreatedAt())
+                , () -> assertEquals(actualFeedLikeListBefore.size() + 1, actualFeedLikeListAfter.size())
+                , () -> assertNull(actualFeedLikeVoBefore) //내가 insert하려고 하는 데이터가 없었는지 단언
+                , () -> assertNotNull(actualFeedLikeVoAfter) //실제 insert가 내가 원하는 데이터로 되었는지 단언
                 , () -> assertEquals(1, actualAffectedRows)
-                , () -> assertEquals(notExistedData.getFeedId(), actualFeedLikeVoAfter.getFeedId())
+                , () -> assertEquals(notExistedData.getFeedId(), actualFeedLikeVoAfter.getFeedId()) //내가 원하는 데이터로 insert 되었는지 더블 체크
                 , () -> assertEquals(notExistedData.getUserId(), actualFeedLikeVoAfter.getUserId())
         );
     }
@@ -109,8 +111,18 @@ class FeedLikeMapperTest {
 
     @Test
     void delFeedLike() {
+        FeedLikeVo actualFeedLikeVoBefore = feedLikeTestMapper.selFeedLikeByFeedIdAndUserId(existedData);
         int actualAffectedRows = feedLikeMapper.delFeedLike(existedData);
-        assertEquals(1, actualAffectedRows);
+        FeedLikeVo actualFeedLikeVoAfter = feedLikeTestMapper.selFeedLikeByFeedIdAndUserId(existedData);
+
+        // then
+        assertAll(
+                  () -> assertEquals(1, actualAffectedRows)
+                , () -> assertNotNull(actualFeedLikeVoBefore)
+                , () -> assertNull(actualFeedLikeVoAfter)
+        );
+
+
     }
 }
 

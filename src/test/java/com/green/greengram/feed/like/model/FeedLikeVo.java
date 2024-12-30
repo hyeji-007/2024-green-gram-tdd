@@ -20,7 +20,6 @@ import lombok.Getter;
  */
 
 @Getter
-@Builder
 @EqualsAndHashCode
 public class FeedLikeVo { //immutable >> Vo, mutable >> Dto
     private long feedId;

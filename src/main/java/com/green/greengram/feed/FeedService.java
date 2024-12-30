@@ -9,7 +9,6 @@ import com.green.greengram.feed.comment.model.FeedCommentDto;
 import com.green.greengram.feed.comment.model.FeedCommentGetReq;
 import com.green.greengram.feed.comment.model.FeedCommentGetRes;
 import com.green.greengram.feed.model.*;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.availability.ApplicationAvailabilityBean;
@@ -89,7 +88,7 @@ public class FeedService {
         for(int i=0; i<list.size(); i++) {
             FeedGetRes item = list.get(i);
             //피드 당 사진 리스트
-            item.setPics(feedPicMapper.selFeedPicList(item.getFeedId()));
+            item.setPics(feedPicMapper.selFeedPicListByFeedId(item.getFeedId()));
 
             //피드 당 댓글 4개
             FeedCommentGetReq commentGetReq = new FeedCommentGetReq(item.getFeedId(), 0, 3);
