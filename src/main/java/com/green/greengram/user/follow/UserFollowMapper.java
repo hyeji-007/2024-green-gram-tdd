@@ -8,5 +8,3 @@ public interface UserFollowMapper {
     int insUserFollow(UserFollowReq p);
     int delUserFollow(UserFollowReq p);
 }
-
-

@@ -3,10 +3,7 @@ package com.green.greengram.feed.like;
 import com.green.greengram.TestUtils;
 import com.green.greengram.feed.like.model.FeedLikeReq;
 import com.green.greengram.feed.like.model.FeedLikeVo;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -69,9 +66,8 @@ class FeedLikeMapperTest {
     // before메소드
 
 
-    @Transactional
-    @Rollback
     @Test
+    @DisplayName("중복된 데이터 입력시 DuplicatedKeyException 발생 체크")
     void insFeedLikeDuplicateDataThrowDuplicateKeyException() {
         // 중복된 데이터 입력시 DuplicatedKeyException 발생 체크
         assertThrows(DuplicateKeyException.class, () -> {
