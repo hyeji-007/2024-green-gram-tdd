@@ -1,15 +1,19 @@
 package com.green.greengram.feed;
 
+import com.green.greengram.common.Constants;
 import com.green.greengram.feed.model.FeedPicDto;
 import com.green.greengram.feed.model.FeedPicSel;
 import com.green.greengram.feed.model.FeedPicVo;
 import net.bytebuddy.build.ToStringPlugin;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.MyBatisSystemException;
+import org.mybatis.spring.boot.autoconfigure.MybatisProperties;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.amqp.RabbitTemplateConfigurer;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.test.context.ActiveProfiles;
 import java.util.ArrayList;
@@ -24,6 +28,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class FeedPicMapperTest {
     @Autowired FeedPicMapper feedPicMapper;
     @Autowired FeedPicTestMapper feedPicTestMapper;
+    @Autowired
+    private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter;
+    @Autowired
+    private MybatisProperties mybatisProperties;
+    @Autowired
+    private Constants constants;
 
     @Test
     void insFeedPicNoFeedIdThrowForeignKeyException() {
@@ -81,11 +91,23 @@ class FeedPicMapperTest {
         int actualAffectedRows = feedPicMapper.insFeedPic(givenParam);
         List<FeedPicVo> feedPicListAfter = feedPicTestMapper.selFeedPicListByFeedId(givenParam.getFeedId());
 
+        //feedPicListAfter에서 pic만 뽑아내서 이전처럼 List<String>변형한 다음 체크한다.
+        List<String> feedOnlyPicList = new ArrayList<>(feedPicListAfter.size());
+        for (FeedPicVo feedPicVo : feedPicListAfter) {
+            feedOnlyPicList.add(feedPicVo.getPic());
+        }
+
+
+        //스트림 이용해서 한다.
         List<String> picList = Arrays.asList(pics);
         for(int i=0; i<pics.length; i++) {
             String pic = picList.get(i);
-            System.out.printf("%s - contains: %b\n", pic, feedPicListAfter.contains(pic));
+            System.out.printf("%s - contains: %b\n", pic, feedOnlyPicList.contains(pic));
         }
+        //Predicate 리턴타입 0 (boolean), 파라미터 0 (FeedPicVo)
+        String[] pics2 = {"a.jpg", "b.jpg", "c.jpg", "d.jpg"};
+        feedPicListAfter.stream().allMatch(feedPicVo -> picList.contains(feedPicVo.getPic()));
+
         assertAll(
                 () -> {
 
@@ -93,10 +115,27 @@ class FeedPicMapperTest {
                 , () -> assertEquals(givenParam.getPics().size(), actualAffectedRows)
                 , () -> assertEquals(0, feedPicListBefore.size())
                 , () -> assertEquals(givenParam.getPics().size(), feedPicListAfter.size())
-                , () -> assertTrue(feedPicListAfter.containsAll(Arrays.asList(pics)))
+                , () -> assertTrue(feedOnlyPicList.containsAll(Arrays.asList(pics)))
+                , () -> assertTrue(Arrays.asList(pics).containsAll(feedOnlyPicList))
+                , () -> assertTrue(feedPicListAfter.stream().allMatch(feedPicVo -> picList.contains(feedPicVo.getPic())))
+
+                , () -> assertTrue(feedPicListAfter.stream() //스트림 생성 Stream<FeedPicVo>
+                                                            .map(FeedPicVo::getPic) //똑같은 크기의 새로운 반환 Stream<String> ["a.jpg", "b.jpg", "c.jpg"]
+                                                            .filter(pic -> picList.contains(pic)) //필터는 연산의 결과가 true인 것만 뽑아내서 새로운 스트림 반환 Stream<String> ["a.jpg", "b.jpg", "c.jpg"]
+                                                            .limit(picList.size()) //스트림 크기를 제한, 이전 스트림의 크기가 10개인데 limit(2)를 하면 2개짜리 스트림이 반환된다.
+                                                            .count() == picList.size())
+
+                     // FeedPicVo::getPic 메소드 참조
+                , () -> assertTrue(feedPicListAfter.stream().map(FeedPicVo::getPic).toList().containsAll(Arrays.asList(pics)))
+
+                    //Function return type 0 (String), parameter 0 (FeedPicVo)
+                , () -> assertTrue(feedPicListAfter.stream().map(feedPicVo -> feedPicVo.getPic()) // ["a.jpg", "b.jpg", "c.jpg"]
+                        .toList() //스트림 > List
+                        .containsAll(Arrays.asList(pics)))
         );
 
         //created_at 단언
 
     }
+
 }
