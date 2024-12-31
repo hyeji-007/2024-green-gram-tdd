@@ -1,5 +1,6 @@
 package com.green.greengram.feed;
 
+import com.green.greengram.TestUtils;
 import com.green.greengram.common.Constants;
 import com.green.greengram.feed.model.FeedPicDto;
 import com.green.greengram.feed.model.FeedPicSel;
@@ -109,15 +110,20 @@ class FeedPicMapperTest {
         feedPicListAfter.stream().allMatch(feedPicVo -> picList.contains(feedPicVo.getPic()));
 
         assertAll(
-                () -> {
-
+                  () -> feedPicListAfter.forEach(feedPicVo -> TestUtils.assertCurrentTimestamp(feedPicVo.getCreatedAt()))
+                , () -> {
+                      for(FeedPicVo feedPicVo : feedPicListAfter) {
+                          TestUtils.assertCurrentTimestamp(feedPicVo.getCreatedAt());
+                      }
                 }
+
+                    // 1 + 2 조합으로 람다식 이해하기
                 , () -> assertEquals(givenParam.getPics().size(), actualAffectedRows)
                 , () -> assertEquals(0, feedPicListBefore.size())
-                , () -> assertEquals(givenParam.getPics().size(), feedPicListAfter.size())
+                , () -> assertEquals(givenParam.getPics().size(), feedPicListAfter.size()) //1
                 , () -> assertTrue(feedOnlyPicList.containsAll(Arrays.asList(pics)))
-                , () -> assertTrue(Arrays.asList(pics).containsAll(feedOnlyPicList))
-                , () -> assertTrue(feedPicListAfter.stream().allMatch(feedPicVo -> picList.contains(feedPicVo.getPic())))
+                , () -> assertTrue(Arrays.asList(pics).containsAll(feedOnlyPicList)) //2-1
+                , () -> assertTrue(feedPicListAfter.stream().allMatch(feedPicVo -> picList.contains(feedPicVo.getPic()))) //2-2
 
                 , () -> assertTrue(feedPicListAfter.stream() //스트림 생성 Stream<FeedPicVo>
                                                             .map(FeedPicVo::getPic) //똑같은 크기의 새로운 반환 Stream<String> ["a.jpg", "b.jpg", "c.jpg"]
