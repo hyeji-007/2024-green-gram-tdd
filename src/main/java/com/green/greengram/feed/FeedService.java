@@ -51,6 +51,7 @@ public class FeedService {
         String middlePath = String.format("feed/%d", feedId);
         myFileUtils.makeFolders(middlePath);
 
+
         //랜덤 파일명 저장용  >> feed_pics 테이블에 저장할 때 사용
         List<String> picNameList = new ArrayList<>(pics.size());
         for(MultipartFile pic : pics) {
