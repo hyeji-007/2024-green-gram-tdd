@@ -2,7 +2,6 @@ package com.green.greengram.user.follow;
 
 import com.green.greengram.config.security.AuthenticationFacade;
 import com.green.greengram.user.follow.model.UserFollowReq;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,13 +24,11 @@ class UserFollowServiceTest {
     @Mock
     AuthenticationFacade authenticationFacade;
 
-    static final long fromUserId1 = 1L;
+    static final long EXPECTED_FROM_USER_ID = 1L;
     static final long toUserId2 = 2L;
     static final long fromUserId3 = 3L;
     static final long toUserId4 = 4L;
 
-    static final UserFollowReq userFollowReq1_2 = new UserFollowReq(toUserId2);
-    static final UserFollowReq userFollowReq3_4 = new UserFollowReq(toUserId4);
 
     @Test
     @DisplayName("postUserFollow 테스트")
@@ -39,15 +36,17 @@ class UserFollowServiceTest {
         //given
         //authenticationFacade Mock 객체의 getSignedUserId()메소드를 호출하면 willReturn값이 리턴이 되게끔 세팅
         final int EXPECTED_RESULT = 13;
-        given(authenticationFacade.getSignedUserId()).willReturn(fromUserId1);
+        final long EXPECTED_FROM_USER_ID = fromUserId3;
+        final long EXPECTED_TO_USER_ID = toUserId4;
+        given(authenticationFacade.getSignedUserId()).willReturn(EXPECTED_FROM_USER_ID);
 
-        UserFollowReq givenParam1_2 = new UserFollowReq(toUserId2);
-        givenParam1_2.setFromUserId(fromUserId1);
-        given(userFollowMapper.insUserFollow(givenParam1_2)).willReturn(EXPECTED_RESULT);
+        UserFollowReq givenParam = new UserFollowReq(EXPECTED_TO_USER_ID);
+        givenParam.setFromUserId( EXPECTED_FROM_USER_ID);
+        given(userFollowMapper.insUserFollow(givenParam)).willReturn(EXPECTED_RESULT);
 
         //when
-        UserFollowReq actualParam0_2 = new UserFollowReq(toUserId2);
-        int actualResult = userFollowService.postUserFollow(actualParam0_2);
+        UserFollowReq actualParam = new UserFollowReq(EXPECTED_TO_USER_ID);
+        int actualResult = userFollowService.postUserFollow(actualParam);
 
         //then
         assertEquals(EXPECTED_RESULT, actualResult);
