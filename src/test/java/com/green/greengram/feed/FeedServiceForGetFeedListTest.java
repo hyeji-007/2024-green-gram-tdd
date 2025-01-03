@@ -3,6 +3,7 @@ package com.green.greengram.feed;
 import com.green.greengram.feed.comment.model.FeedCommentDto;
 import com.green.greengram.feed.model.FeedGetRes;
 import com.green.greengram.feed.model.FeedWithPicCommentDto;
+import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -92,5 +93,48 @@ public class FeedServiceForGetFeedListTest extends FeedServiceParentTest {
     void objfeedGetRes_2() {
         List<FeedCommentDto> list = expectedFeedCommentDto.getCommentList();
         list.addAll(feedId4Comments);
+
+        FeedGetRes actualResult = new FeedGetRes(expectedFeedCommentDto);
+        assertAll(
+                  () -> assertEquals(expectedFeedCommentDto.getFeedId(), actualResult.getFeedId())
+                , () -> assertEquals(expectedFeedCommentDto.getContents(), actualResult.getContents())
+                , () -> assertEquals(expectedFeedCommentDto.getLocation(),actualResult.getLocation())
+                , () -> assertEquals(expectedFeedCommentDto.getCreatedAt(), actualResult.getCreatedAt())
+                , () -> assertEquals(expectedFeedCommentDto.getWriterUserId(), actualResult.getWriterUserId())
+                , () -> assertEquals(expectedFeedCommentDto.getWriterNm(), actualResult.getWriterNm())
+                , () -> assertEquals(expectedFeedCommentDto.getWriterPic(), actualResult.getWriterPic())
+                , () -> assertEquals(expectedFeedCommentDto.getIsLike(), actualResult.getIsLike())
+                , () -> assertEquals(expectedFeedCommentDto.getPics(), actualResult.getPics())
+                , () -> assertTrue(actualResult.getComment().isMoreComment())
+                , () -> assertEquals(3, actualResult.getComment().getCommentList().size())
+                , () -> {
+                    List<FeedCommentDto> commentList = actualResult.getComment().getCommentList();
+                    for(int i = 0; i < commentList.size(); i++) {
+                          assertEquals(feedId4Comments.get(i), commentList.get(i));
+                      }
+                }
+
+        );
+
+        System.out.println(feedId4Comments.size()); //4
+        System.out.println(expectedFeedCommentDto.getCommentList().size()); //3
+        System.out.println(actualResult.getComment().getCommentList().size()); //3
+    }
+
+    @Test
+    @DisplayName("getFeedList4 테스트 FeedWithPicCommentDto >> FeedGetRes")
+    void getFeedList4() {
+        List<FeedCommentDto> list = expectedFeedCommentDto.getCommentList();
+        list.addAll(feedId4Comments);
+
+        FeedWithPicCommentDto dto1 = ObjectUtils.clone(expectedFeedCommentDto);
+        dto1.getCommentList().addAll(feedId3Comments);
+
+        FeedWithPicCommentDto dto2 = ObjectUtils.clone(expectedFeedCommentDto);
+        dto2.getCommentList().addAll(feedId4Comments);
+
+        List<FeedWithPicCommentDto> dtoList = Arrays.asList(dto1, dto2);
+
+        List<FeedGetRes> expectedList = new ArrayList<>(2);
     }
 }
