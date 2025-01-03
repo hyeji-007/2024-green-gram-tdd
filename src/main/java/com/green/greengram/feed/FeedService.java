@@ -34,7 +34,6 @@ public class FeedService {
     private final FeedCommentMapper feedCommentMapper;
     private final MyFileUtils myFileUtils;
     private final AuthenticationFacade authenticationFacade;
-    private final ApplicationAvailabilityBean applicationAvailability;
 
     @Transactional
     //자동 커밋 종료
